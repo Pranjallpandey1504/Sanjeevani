@@ -197,29 +197,31 @@ function App() {
   };
 
   const saveChatToHistory = async (chat) => {
-    try {
-      const res = await fetch("http://localhost:5000/api/chats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user, messages: chat.messages }),
-      });
-      const newChat = await res.json();
-      setChatHistory((prev) => [...prev, newChat]);
-    } catch (err) {
-      console.error("Error saving chat:", err);
-    }
-  };
+  try {
+    const res = await fetch("http://localhost:5000/api/chats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userEmail: user, messages: chat.messages }),
+    });
+    const newChat = await res.json();
+    setChatHistory((prev) => [...prev, newChat]);
+  } catch (err) {
+    console.error("Error saving chat:", err);
+  }
+};
+
 
   const deleteChatSession = async (id) => {
-    try {
-      await fetch(`http://localhost:5000/api/chats/${id}`, {
-        method: "DELETE",
-      });
-      setChatHistory((prev) => prev.filter((c) => c._id !== id));
-    } catch (err) {
-      console.error("Error deleting chat:", err);
-    }
-  };
+  try {
+    await fetch(`http://localhost:5000/api/chats/${id}`, {
+      method: "DELETE",
+    });
+    setChatHistory((prev) => prev.filter((c) => c._id !== id));
+  } catch (err) {
+    console.error("Error deleting chat:", err);
+  }
+};
+
 
   const detectGujaratiRoman = (text) => {
     const gujKeywords = [
@@ -326,33 +328,36 @@ function App() {
   };
 
   const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) return;
+  if (!email.trim() || !password.trim()) return;
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/${mode}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch(`http://localhost:5000/api/${mode}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.msg);
 
-      if (mode === "signup") {
-        // Show a message and redirect to login mode
-        alert("Signup successful! Please login.");
-        setMode("login");
-        setEmail("");
-        setPassword("");
-      } else {
-        // Login flow
-        localStorage.setItem("userEmail", data.email);
-        setUser(data.email);
-      }
-    } catch (err) {
-      alert(err.message);
+    if (mode === "signup") {
+      // Show a message and redirect to login mode
+      alert("Signup successful! Please login.");
+      setMode("login");
+      setEmail("");
+      setPassword("");
+    } else {
+      // Login flow
+      localStorage.setItem("userEmail", data.email);
+      setUser(data.email);
     }
-  };
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+
+
 
   const handleLogout = () => {
     localStorage.removeItem("userEmail");
