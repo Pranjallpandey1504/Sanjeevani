@@ -197,31 +197,29 @@ function App() {
   };
 
   const saveChatToHistory = async (chat) => {
-  try {
-    const res = await fetch("http://localhost:5000/api/chats", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userEmail: user, messages: chat.messages }),
-    });
-    const newChat = await res.json();
-    setChatHistory((prev) => [...prev, newChat]);
-  } catch (err) {
-    console.error("Error saving chat:", err);
-  }
-};
-
+    try {
+      const res = await fetch("http://localhost:5000/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: user, messages: chat.messages }),
+      });
+      const newChat = await res.json();
+      setChatHistory((prev) => [...prev, newChat]);
+    } catch (err) {
+      console.error("Error saving chat:", err);
+    }
+  };
 
   const deleteChatSession = async (id) => {
-  try {
-    await fetch(`http://localhost:5000/api/chats/${id}`, {
-      method: "DELETE",
-    });
-    setChatHistory((prev) => prev.filter((c) => c._id !== id));
-  } catch (err) {
-    console.error("Error deleting chat:", err);
-  }
-};
-
+    try {
+      await fetch(`http://localhost:5000/api/chats/${id}`, {
+        method: "DELETE",
+      });
+      setChatHistory((prev) => prev.filter((c) => c._id !== id));
+    } catch (err) {
+      console.error("Error deleting chat:", err);
+    }
+  };
 
   const detectGujaratiRoman = (text) => {
     const gujKeywords = [
@@ -328,36 +326,33 @@ function App() {
   };
 
   const handleLogin = async () => {
-  if (!email.trim() || !password.trim()) return;
+    if (!email.trim() || !password.trim()) return;
 
-  try {
-    const res = await fetch(`http://localhost:5000/api/${mode}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch(`http://localhost:5000/api/${mode}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.msg);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg);
 
-    if (mode === "signup") {
-      // Show a message and redirect to login mode
-      alert("Signup successful! Please login.");
-      setMode("login");
-      setEmail("");
-      setPassword("");
-    } else {
-      // Login flow
-      localStorage.setItem("userEmail", data.email);
-      setUser(data.email);
+      if (mode === "signup") {
+        // Show a message and redirect to login mode
+        alert("Signup successful! Please login.");
+        setMode("login");
+        setEmail("");
+        setPassword("");
+      } else {
+        // Login flow
+        localStorage.setItem("userEmail", data.email);
+        setUser(data.email);
+      }
+    } catch (err) {
+      alert(err.message);
     }
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-
-
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userEmail");
@@ -372,9 +367,9 @@ function App() {
   // 🔐 LOGIN screen before chatbot loads
   if (!user) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100">
+      <div className="h-screen flex items-center justify-center bg-gradient-to-r from-teal-100 to-purple-100">
         <div className="bg-white p-6 rounded shadow max-w-sm w-full">
-          <h2 className="text-xl font-bold mb-4 text-center text-blue-600">
+          <h2 className="text-xl font-bold mb-4 text-center text-teal-600">
             {mode === "login" ? "Login to Sanjeevani" : "Sign Up to Sanjeevani"}
           </h2>
 
@@ -396,7 +391,7 @@ function App() {
 
           <button
             onClick={handleLogin}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 mb-2"
+            className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700 mb-2"
           >
             {mode === "login" ? "Login" : "Sign Up"}
           </button>
@@ -405,7 +400,7 @@ function App() {
             {mode === "login" ? "New user?" : "Already have an account?"}
             <button
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-blue-600 ml-2 hover:underline"
+              className="text-teal-600 ml-2 hover:underline"
             >
               {mode === "login" ? "Sign Up" : "Login"}
             </button>
@@ -416,246 +411,252 @@ function App() {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-r from-blue-100 to-purple-100 flex flex-col p-4 max-w-3xl mx-auto">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-start gap-3">
-          <img src="/logo.png" alt="Logo" className="w-10 h-10 mt-1" />
-          <div>
-            <h1 className="text-3xl font-bold text-blue-600">
-              {uiText[language].title}
-            </h1>
-            <p className="text-sm text-gray-600">
-              {uiText[language].description}
-            </p>
-          </div>
-        </div>
-
-        <div className="relative account-menu">
-          <button
-            onClick={() => setShowAccountMenu(!showAccountMenu)}
-            className="text-2xl hover:opacity-80"
-            title="Account"
-          >
-            👤
-          </button>
-
-          {showAccountMenu && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50">
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                🔓 Logout
-              </button>
-              <button
-                onClick={() => {
-                  setShowAboutModal(true);
-                  setShowAccountMenu(false);
-                }}
-                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-              >
-                ℹ️ About Us
-              </button>
+    <div className="max-h-screen bg-teal-100 flex items-center justify-center">
+      <div className="h-[100vh] w-[60vw] bg-white flex flex-col p-6 mx-auto rounded-xl shadow-xl">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-start gap-3">
+            <img src="/logo.png" alt="Logo" className="w-10 h-10 mt-1" />
+            <div>
+              <h1 className="text-3xl font-bold text-teal-800">
+                {uiText[language].title}
+              </h1>
+              <p className="text-sm text-gray-600">
+                {uiText[language].description}
+              </p>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      <div className="flex flex-wrap gap-2 justify-between items-start mb-2">
-        <div className="flex gap-2 flex-wrap">
-          <select
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="border p-2 rounded"
-          >
-            {Object.entries(languageLabel).map(([code, label]) => (
-              <option key={code} value={code}>
-                {label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="border p-2 rounded"
-          >
-            {Object.entries(healthCategories).map(([code, label]) => (
-              <option key={code} value={code}>
-                {label[language]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          onClick={() => setShowHistory(true)}
-          className="ml-auto bg-white border px-3 py-2 rounded hover:bg-gray-100"
-        >
-          🕘 Past Chats
-        </button>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-2">
-        {keywordMap[language].map((kw, i) => (
-          <button
-            key={i}
-            onClick={() => setInput(kw)}
-            className="bg-blue-200 px-3 py-1 rounded-full text-sm"
-          >
-            {kw}
-          </button>
-        ))}
-      </div>
-
-      <div
-        ref={chatRef}
-        className="flex-1 bg-gradient-to-br from-blue-50 via-purple-50 to-white p-3 rounded shadow overflow-y-auto max-h-[60vh] mb-2 bg-cover bg-center"
-        style={{ backgroundImage: 'url("./background.png")' }}
-      >
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`my-2 ${
-              msg.sender === "user" ? "text-right" : "text-left"
-            }`}
-          >
-            <div
-              className={`inline-block px-3 py-2 rounded ${
-                msg.sender === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-black"
-              }`}
+          <div className="relative account-menu">
+            <button
+              onClick={() => setShowAccountMenu(!showAccountMenu)}
+              className="text-2xl hover:opacity-80"
+              title="Account"
             >
-              {msg.text.split("\n").map((line, index) => (
-                <div key={index}>{line}</div>
-              ))}
-              {msg.sender === "bot" && (
-                <div className="mt-1 flex items-center gap-2">
-                  <button
-                    onClick={() => handlePlayPause(msg, i)}
-                    className="text-sm bg-blue-600 text-white px-2 py-1 rounded"
-                  >
-                    {audioPlayingId === i ? "⏸ Pause" : "▶ Play"}
-                  </button>
-                  <div className="w-28 h-2 bg-blue-100 rounded overflow-hidden">
-                    <div
-                      className="h-2 bg-blue-600"
-                      style={{
-                        width: `${audioPlayingId === i ? audioProgress : 0}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="text-left text-gray-500">
-            {uiText[language].typing}
-          </div>
-        )}
-      </div>
+              👤
+            </button>
 
-      <div className="flex gap-2 flex-wrap">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          rows="2"
-          placeholder={uiText[language].placeholder}
-          className="flex-1 border p-2 rounded resize-none max-w-full"
-        />
-
-        <button
-          onClick={sendMessage}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Send
-        </button>
-        <button
-          onClick={handleVoiceInput}
-          className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-        >
-          🎤
-        </button>
-        <button
-          onClick={handleNewChat}
-          className="bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200"
-        >
-          🧹 New Chat
-        </button>
-      </div>
-
-      {showHistory && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-lg font-bold">🕘 Past Chats</h2>
-              <button
-                onClick={() => setShowHistory(false)}
-                className="text-gray-600 text-lg hover:text-gray-900"
-              >
-                ✖
-              </button>
-            </div>
-
-            {chatHistory.length === 0 ? (
-              <p className="text-gray-600">No saved chats.</p>
-            ) : (
-              chatHistory.map((chat) => (
-                <div
-                  key={chat.id}
-                  className="flex justify-between items-center mb-2 border rounded p-2 hover:bg-blue-50"
+            {showAccountMenu && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow z-50">
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
-                  <button
-                    onClick={() => {
-                      setMessages(chat.messages);
-                      setShowHistory(false);
-                    }}
-                    className="text-left flex-1"
-                  >
-                    <strong>{chat.title}</strong>
-                    <br />
-                    <span className="text-xs text-gray-500">{chat.date}</span>
-                  </button>
-                  <button
-                    onClick={() => deleteChatSession(chat.id)}
-                    className="text-red-600 hover:text-red-800 ml-2"
-                  >
-                    🗑
-                  </button>
-                </div>
-              ))
+                  🔓 Logout
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAboutModal(true);
+                    setShowAccountMenu(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  ℹ️ About Us
+                </button>
+              </div>
             )}
           </div>
         </div>
-      )}
-      {showAboutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-            <button
-              onClick={() => setShowAboutModal(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"
+
+        <div className="flex flex-wrap gap-2 justify-between items-start mb-2">
+          <div className="flex gap-2 flex-wrap">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="border p-2 rounded"
             >
-              ✖
-            </button>
-            <h2 className="text-2xl font-bold text-blue-600 mb-2">
-              About 🌿 Sanjeevani
-            </h2>
-            <p className="text-gray-700 mb-2">
-              🌿 <strong>Sanjeevanit</strong> is your multilingual health
-              assistant. It helps users describe symptoms and get safe, friendly
-              AI-based suggestions.
-            </p>
-            <p className="text-gray-700">
-              🌐 Supports languages like English, हिंदी, ગુજરાતી, मराठी, తెలుగు.
-              Designed for all age groups and healthcare categories.
-            </p>
+              {Object.entries(languageLabel).map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="border p-2 rounded"
+            >
+              {Object.entries(healthCategories).map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label[language]}
+                </option>
+              ))}
+            </select>
           </div>
+
+          <button
+            onClick={() => setShowHistory(true)}
+            className="ml-auto bg-white border px-3 py-2 rounded hover:bg-gray-100"
+          >
+            🕘 Past Chats
+          </button>
         </div>
-      )}
+
+        <div className="flex flex-wrap gap-2 mb-2">
+          {keywordMap[language].map((kw, i) => (
+            <button
+              key={i}
+              onClick={() => setInput(kw)}
+              className="bg-white border border-teal-500 text-teal-600 px-3 py-1 rounded-full text-sm hover:bg-teal-50"
+            >
+              {kw}
+            </button>
+          ))}
+        </div>
+
+        <div
+          ref={chatRef}
+          className="flex-1 bg-gradient-to-br from-teal-50 via-purple-50 to-white p-3 rounded shadow overflow-y-auto max-h-[60vh] mb-2 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url("./background1.jpg")',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`my-2 ${
+                msg.sender === "user" ? "text-right" : "text-left"
+              }`}
+            >
+              <div
+                className={`inline-block px-3 py-2 rounded ${
+                  msg.sender === "user"
+                    ? "bg-teal-500 text-white"
+                    : "bg-gray-200 text-black"
+                }`}
+              >
+                {msg.text.split("\n").map((line, index) => (
+                  <div key={index}>{line}</div>
+                ))}
+                {msg.sender === "bot" && (
+                  <div className="mt-1 flex items-center gap-2">
+                    <button
+                      onClick={() => handlePlayPause(msg, i)}
+                      className="text-sm bg-teal-600 text-white px-2 py-1 rounded"
+                    >
+                      {audioPlayingId === i ? "⏸ Pause" : "▶ Play"}
+                    </button>
+                    <div className="w-28 h-2 bg-teal-100 rounded overflow-hidden">
+                      <div
+                        className="h-2 bg-teal-600"
+                        style={{
+                          width: `${audioPlayingId === i ? audioProgress : 0}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          {loading && (
+            <div className="text-left text-gray-500">
+              {uiText[language].typing}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2 flex-wrap">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyPress}
+            rows="2"
+            placeholder={uiText[language].placeholder}
+            className="flex-1 border p-2 rounded resize-none max-w-full"
+          />
+
+          <button
+            onClick={sendMessage}
+            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-600"
+          >
+            Send
+          </button>
+          <button
+            onClick={handleVoiceInput}
+            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          >
+            🎤
+          </button>
+          <button
+            onClick={handleNewChat}
+            className="bg-red-100 text-red-600 px-4 py-2 rounded hover:bg-red-200"
+          >
+            🧹 New Chat
+          </button>
+        </div>
+
+        {showHistory && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto p-4">
+              <div className="flex justify-between items-center mb-3">
+                <h2 className="text-lg font-bold">🕘 Past Chats</h2>
+                <button
+                  onClick={() => setShowHistory(false)}
+                  className="text-gray-600 text-lg hover:text-gray-900"
+                >
+                  ✖
+                </button>
+              </div>
+
+              {chatHistory.length === 0 ? (
+                <p className="text-gray-600">No saved chats.</p>
+              ) : (
+                chatHistory.map((chat) => (
+                  <div
+                    key={chat.id}
+                    className="flex justify-between items-center mb-2 border rounded p-2 hover:bg-teal-50"
+                  >
+                    <button
+                      onClick={() => {
+                        setMessages(chat.messages);
+                        setShowHistory(false);
+                      }}
+                      className="text-left flex-1"
+                    >
+                      <strong>{chat.title}</strong>
+                      <br />
+                      <span className="text-xs text-gray-500">{chat.date}</span>
+                    </button>
+                    <button
+                      onClick={() => deleteChatSession(chat.id)}
+                      className="text-red-600 hover:text-red-800 ml-2"
+                    >
+                      🗑
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+        {showAboutModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+              <button
+                onClick={() => setShowAboutModal(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"
+              >
+                ✖
+              </button>
+              <h2 className="text-2xl font-bold text-teal-600 mb-2">
+                About 🌿 Sanjeevani
+              </h2>
+              <p className="text-gray-700 mb-2">
+                🌿 <strong>Sanjeevanit</strong> is your multilingual health
+                assistant. It helps users describe symptoms and get safe,
+                friendly AI-based suggestions.
+              </p>
+              <p className="text-gray-700">
+                🌐 Supports languages like English, हिंदी, ગુજરાતી, मराठी,
+                తెలుగు. Designed for all age groups and healthcare categories.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
