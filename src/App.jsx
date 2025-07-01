@@ -403,7 +403,8 @@ function App() {
 
   return (
     <div className="max-h-screen bg-teal-100 flex items-center justify-center">
-      <div className="h-[100vh] w-[60vw] bg-white flex flex-col p-6 mx-auto rounded-xl shadow-xl">
+      <div className="h-screen w-[95vw] sm:w-[90vw] md:w-[80vw] lg:w-[60vw] bg-white flex flex-col p-4 sm:p-6 mx-auto rounded-xl shadow-xl">
+
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-start gap-3">
             <img src="/logo.png" alt="Logo" className="w-10 h-10 mt-1" />
@@ -448,12 +449,13 @@ function App() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-between items-start mb-2">
+       <div className="flex flex-col sm:flex-row flex-wrap gap-2 justify-between items-start mb-2">
+
           <div className="flex gap-2 flex-wrap">
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="border p-2 rounded"
+              className="w-full sm:w-auto border p-2 rounded"
             >
               {Object.entries(languageLabel).map(([code, label]) => (
                 <option key={code} value={code}>
@@ -499,10 +501,12 @@ function App() {
           ref={chatRef}
           className="flex-1 bg-gradient-to-br from-teal-50 via-purple-50 to-white p-3 rounded shadow overflow-y-auto max-h-[60vh] mb-2 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("./background1.jpg")',
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+  backgroundImage: 'url("./background1.jpg")',
+  backgroundSize: "contain",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "center",
+}}
+
         >
           {messages.map((msg, i) => (
             <div
@@ -549,14 +553,15 @@ function App() {
           )}
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
             rows="2"
             placeholder={uiText[language].placeholder}
-            className="flex-1 border p-2 rounded resize-none max-w-full"
+            className="w-full sm:flex-1 border p-2 rounded resize-none"
+
           />
 
           <button
