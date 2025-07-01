@@ -142,14 +142,10 @@ function App() {
   }, [language]);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".account-menu")) {
-        setShowAccountMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    const userChats = users[user]?.chats || [];
+    setChatHistory(userChats);
+  }, [user]);
 
   const handleVoiceInput = () => {
     recognitionRef.current?.start();
@@ -196,29 +192,27 @@ function App() {
     }
   };
 
-  const saveChatToHistory = async (chat) => {
-    try {
-      const res = await fetch("http://localhost:5000/api/chats", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user, messages: chat.messages }),
-      });
-      const newChat = await res.json();
-      setChatHistory((prev) => [...prev, newChat]);
-    } catch (err) {
-      console.error("Error saving chat:", err);
-    }
+  const saveChatToHistory = (chat) => {
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    const userChats = users[user]?.chats || [];
+    const title = chat.messages[0]?.text?.slice(0, 30) || "Chat";
+    const date = new Date().toLocaleString();
+    const newChat = { id: Date.now(), title, date, messages: chat.messages };
+
+    const updatedChats = [...userChats, newChat];
+    users[user].chats = updatedChats;
+
+    localStorage.setItem("users", JSON.stringify(users));
+    setChatHistory(updatedChats);
   };
 
-  const deleteChatSession = async (id) => {
-    try {
-      await fetch(`http://localhost:5000/api/chats/${id}`, {
-        method: "DELETE",
-      });
-      setChatHistory((prev) => prev.filter((c) => c._id !== id));
-    } catch (err) {
-      console.error("Error deleting chat:", err);
-    }
+  const deleteChatSession = (id) => {
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    const updatedChats = (users[user]?.chats || []).filter((c) => c.id !== id);
+    users[user].chats = updatedChats;
+
+    localStorage.setItem("users", JSON.stringify(users));
+    setChatHistory(updatedChats);
   };
 
   const detectGujaratiRoman = (text) => {
@@ -325,32 +319,29 @@ function App() {
     speechSynthesis.cancel();
   };
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (!email.trim() || !password.trim()) return;
 
-    try {
-      const res = await fetch(`http://localhost:5000/api/${mode}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
-
-      if (mode === "signup") {
-        // Show a message and redirect to login mode
-        alert("Signup successful! Please login.");
-        setMode("login");
-        setEmail("");
-        setPassword("");
-      } else {
-        // Login flow
-        localStorage.setItem("userEmail", data.email);
-        setUser(data.email);
+    if (mode === "signup") {
+      if (users[email]) {
+        alert("User already exists.");
+        return;
       }
-    } catch (err) {
-      alert(err.message);
+      users[email] = { password, chats: [] };
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Signup successful! Please login.");
+      setMode("login");
+      setEmail("");
+      setPassword("");
+    } else {
+      if (!users[email] || users[email].password !== password) {
+        alert("Invalid credentials.");
+        return;
+      }
+      localStorage.setItem("userEmail", email);
+      setUser(email);
     }
   };
 
